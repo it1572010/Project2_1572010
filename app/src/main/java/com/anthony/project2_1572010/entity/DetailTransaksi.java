@@ -3,15 +3,17 @@ package com.anthony.project2_1572010.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.List;
+
 public class DetailTransaksi implements Parcelable {
-    private Barang barang;
+    private List<Barang> barang;
     private Transaksi transaksi;
 
     public DetailTransaksi() {
     }
 
     protected DetailTransaksi(Parcel in) {
-        barang = in.readParcelable(Barang.class.getClassLoader());
+        barang = in.createTypedArrayList(Barang.CREATOR);
         transaksi = in.readParcelable(Transaksi.class.getClassLoader());
     }
 
@@ -27,11 +29,11 @@ public class DetailTransaksi implements Parcelable {
         }
     };
 
-    public Barang getBarang() {
+    public List<Barang> getBarang() {
         return barang;
     }
 
-    public void setBarang(Barang barang) {
+    public void setBarang(List<Barang> barang) {
         this.barang = barang;
     }
 
@@ -50,7 +52,7 @@ public class DetailTransaksi implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(barang, flags);
+        dest.writeTypedList(barang);
         dest.writeParcelable(transaksi, flags);
     }
 }
