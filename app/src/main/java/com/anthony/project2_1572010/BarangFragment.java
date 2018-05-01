@@ -31,6 +31,8 @@ import butterknife.OnClick;
 
 public class BarangFragment extends Fragment {
 
+    final static String ARG_Barang = "parcel_barang";
+
     @BindView(R.id.txtNamaBarang)
     EditText txtNamaBarang;
     @BindView(R.id.txtStockBarang)
@@ -65,9 +67,9 @@ public class BarangFragment extends Fragment {
         if(getArguments() != null && getArguments().containsKey(getResources().getString(R.string.parcel_barang))){
             Barang barang = getArguments().getParcelable(getResources().getString(R.string.parcel_barang));
             txtNamaBarang.setText(barang.getNamaBarang());
-            txtStockBarang.setText(barang.getStock());
-            txtHargaJualBarang.setText(barang.getHargaJual());
-            txtHargaBeliBarang.setText(barang.getHargaBeli());
+            txtStockBarang.setText(String.valueOf(barang.getStock()));
+            txtHargaJualBarang.setText(String.valueOf(barang.getHargaJual()));
+            txtHargaBeliBarang.setText(String.valueOf(barang.getHargaBeli()));
         }
     }
 

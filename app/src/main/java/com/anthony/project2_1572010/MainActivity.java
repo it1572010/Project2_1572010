@@ -32,7 +32,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,UserAdapter.UserDataListener,
+        implements NavigationView.OnNavigationItemSelectedListener, UserAdapter.UserDataListener,
         BarangAdapter.BarangDataListener {
 
     private DatabaseReference userRef;
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity
     RecyclerView recyclerUsers;
 
     public BarangListFragment getBarangListFragment() {
-        if(barangListFragment == null){
+        if (barangListFragment == null) {
             barangListFragment = new BarangListFragment();
             barangListFragment.getBarangAdapter().setBarangDataListener(this);
         }
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public UserListFragment getUserListFragment() {
-        if(userListFragment == null){
+        if (userListFragment == null) {
             userListFragment = new UserListFragment();
             userListFragment.getUserAdapter().setUserDataListener(this);
         }
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 MainActivity.this.finish();
                 MainActivity.this.startActivity(intent);
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -123,7 +123,10 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_logout) {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            MainActivity.this.finish();
+            MainActivity.this.startActivity(intent);
             return true;
         }
 
@@ -165,7 +168,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public UserAdapter getUserAdapter() {
-        if(userAdapter == null){
+        if (userAdapter == null) {
             userAdapter = new UserAdapter();
             userAdapter.setUserDataListener(this);
         }
@@ -180,7 +183,7 @@ public class MainActivity extends AppCompatActivity
         return barangAdapter;
     }
 
-    public void populateUserData(){
+    public void populateUserData() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         userRef = database.getReference();
         userRef.child("User").addValueEventListener(new ValueEventListener() {
@@ -194,15 +197,16 @@ public class MainActivity extends AppCompatActivity
                 }
                 getUserAdapter().setUsers(users);
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                System.out.println(databaseError.getDetails()+" "+databaseError.getMessage());
+                System.out.println(databaseError.getDetails() + " " + databaseError.getMessage());
             }
         });
         getUserListFragment().getUserAdapter().setUsers(users);
     }
 
-    public void populateBarangData(){
+    public void populateBarangData() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         userRef = database.getReference();
         userRef.child("Barang").addValueEventListener(new ValueEventListener() {
@@ -216,9 +220,10 @@ public class MainActivity extends AppCompatActivity
                 }
                 getBarangAdapter().setBarangs(barangs);
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                System.out.println(databaseError.getDetails()+" "+databaseError.getMessage());
+                System.out.println(databaseError.getDetails() + " " + databaseError.getMessage());
             }
         });
         getBarangListFragment().getBarangAdapter().setBarangs(barangs);
@@ -226,11 +231,45 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBarangClicked(Barang barang) {
-
+        if (findViewById(R.id.frameKiri) != null) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(BarangFragment.ARG_Barang, barang);
+            BarangFragment barangFragment = new BarangFragment();
+            barangFragment.setArguments(bundle);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.frameKiri, barangFragment);
+            transaction.commit();
+        } else {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(BarangFragment.ARG_Barang, barang);
+            BarangFragment barangFragment = new BarangFragment();
+            barangFragment.setArguments(bundle);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.frameKanan, barangFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+        }
     }
 
     @Override
     public void onUserClicked(User user) {
-
+        if (findViewById(R.id.frameKiri) != null) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(UserFragment.ARG_User, user);
+            UserFragment userFragment = new UserFragment();
+            userFragment.setArguments(bundle);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.frameKiri, userFragment);
+            transaction.commit();
+        } else {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(UserFragment.ARG_User, user);
+            UserFragment userFragment = new UserFragment();
+            userFragment.setArguments(bundle);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.frameKanan, userFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+        }
     }
 }

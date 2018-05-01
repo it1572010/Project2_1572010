@@ -32,6 +32,9 @@ import butterknife.OnClick;
  */
 
 public class UserFragment extends Fragment {
+
+    final static String ARG_User = "parcel_user";
+
     @BindView(R.id.txtNama)
     EditText txtNama;
     @BindView(R.id.txtUsername)
