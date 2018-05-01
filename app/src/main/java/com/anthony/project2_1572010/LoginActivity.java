@@ -48,8 +48,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.btnLogin)
-    private void btnLoginAct() {
-        if (!TextUtils.isEmpty(txtUsername.getText().toString().trim()) || !TextUtils.isEmpty(txtPassword.getText().toString().trim())) {
+    void btnLoginAct() {
+        if (!TextUtils.isEmpty(txtUsername.getText().toString().trim()) && !TextUtils.isEmpty(txtPassword.getText().toString().trim())) {
             userRf.child("User").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {

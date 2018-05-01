@@ -17,6 +17,14 @@ public class Barang implements Parcelable {
     public Barang() {
     }
 
+    public Barang(Barang barang) {
+        hargaBeli = barang.getHargaBeli();
+        hargaJual = barang.getHargaJual();
+        idBarang = barang.getIdBarang();
+        namaBarang = barang.getNamaBarang();
+        stock = barang.getStock();
+    }
+
     protected Barang(Parcel in) {
         hargaBeli = in.readInt();
         hargaJual = in.readInt();

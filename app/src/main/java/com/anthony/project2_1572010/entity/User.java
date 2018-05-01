@@ -16,6 +16,16 @@ public class User implements Parcelable {
     private String password;
     private String username;
 
+    public User(User user) {
+        admin = user.getAdmin();
+        alamatUser = user.getAlamatUser();
+        idUser = user.getIdUser();
+        namaUser = user.getNamaUser();
+        noTelpUser = user.getNoTelpUser();
+        password = user.getPassword();
+        username = user.getUsername();
+    }
+
     protected User(Parcel in) {
         admin = in.readInt();
         alamatUser = in.readString();
