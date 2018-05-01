@@ -56,8 +56,11 @@ public class UserFragment extends Fragment {
 
     private DatabaseReference database;
     boolean addData;
+    boolean updateData;
+    boolean deleteData;
     int id;
     private MainActivity mainActivity;
+    public User selectedUser;
 
     public UserFragment() {
     }
@@ -67,6 +70,8 @@ public class UserFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         database = FirebaseDatabase.getInstance().getReference();
         addData=false;
+        updateData=false;
+        deleteData=false;
         id=0;
         View view=inflater.inflate(R.layout.fragment_user,container,false);
         ButterKnife.bind(this,view);
@@ -83,6 +88,7 @@ public class UserFragment extends Fragment {
             txtNama.setText(user.getNamaUser());
             txtNoTelepeon.setText(user.getNoTelpUser());
             txtUsername.setText(user.getUsername());
+            selectedUser = user;
         }
     }
 
@@ -122,6 +128,51 @@ public class UserFragment extends Fragment {
                     txtUsername.setText("");
                     addData = true;
                     Toast.makeText(getActivity(), "Data User berhasil ditambahkan!", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    @OnClick(R.id.btnUpdate)
+    public void btnUpdateUser(){
+        if(!TextUtils.isEmpty(txtNama.getText().toString().trim()) && !TextUtils.isEmpty(txtUsername.getText().toString().trim()) && !TextUtils.isEmpty(txtNoTelepeon.getText().toString().trim()) && !TextUtils.isEmpty(txtPassword.getText().toString().trim()) && !TextUtils.isEmpty(txtAlamat.getText().toString().trim())){
+            selectedUser.setIdUser("00"+String.valueOf((id+1)));
+            selectedUser.setAdmin(1);
+            selectedUser.setAlamatUser(txtAlamat.getText().toString());
+            selectedUser.setNamaUser(txtNama.getText().toString());
+            selectedUser.setNoTelpUser(txtNoTelepeon.getText().toString());
+            selectedUser.setUsername(txtUsername.getText().toString());
+            selectedUser.setPassword(txtPassword.getText().toString());
+            database.child("User").child(selectedUser.getIdUser()).setValue(selectedUser).addOnSuccessListener(getActivity(), new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    txtAlamat.setText("");
+                    txtNama.setText("");
+                    txtNoTelepeon.setText("");
+                    txtPassword.setText("");
+                    txtRePassword.setText("");
+                    txtUsername.setText("");
+                    updateData = true;
+                    Toast.makeText(getActivity(), "Data User berhasil diubah!", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    @OnClick(R.id.btnDelete)
+    public void btnDeleteUser(){
+        if(selectedUser!=null){
+            database.child("User").child(selectedUser.getIdUser()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    txtAlamat.setText("");
+                    txtNama.setText("");
+                    txtNoTelepeon.setText("");
+                    txtPassword.setText("");
+                    txtRePassword.setText("");
+                    txtUsername.setText("");
+                    deleteData = true;
+                    Toast.makeText(getActivity(), "Data User berhasil didelete!", Toast.LENGTH_SHORT).show();
                 }
             });
         }
