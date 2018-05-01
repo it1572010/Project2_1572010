@@ -44,8 +44,11 @@ public class BarangFragment extends Fragment {
 
     private DatabaseReference database;
     boolean addData;
+    boolean updateData;
+    boolean deleteData;
     int id;
     private MainActivity mainActivity;
+    public Barang selectedBarang;
 
     public BarangFragment() {
     }
@@ -55,6 +58,8 @@ public class BarangFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         database = FirebaseDatabase.getInstance().getReference();
         addData = false;
+        updateData = false;
+        deleteData = false;
         View view = inflater.inflate(R.layout.fragment_barang,container,false);
         ButterKnife.bind(this,view);
         return view;
@@ -70,6 +75,7 @@ public class BarangFragment extends Fragment {
             txtStockBarang.setText(String.valueOf(barang.getStock()));
             txtHargaJualBarang.setText(String.valueOf(barang.getHargaJual()));
             txtHargaBeliBarang.setText(String.valueOf(barang.getHargaBeli()));
+            selectedBarang=barang;
         }
     }
 
@@ -105,6 +111,44 @@ public class BarangFragment extends Fragment {
                     txtHargaJualBarang.setText("");
                     addData = true;
                     Toast.makeText(getActivity(), "Data Barang berhasil ditambahkan!", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    @OnClick(R.id.btnUpdate)
+    public void btnUpdateBarang(){
+        if(!TextUtils.isEmpty(txtNamaBarang.getText().toString().trim()) && !TextUtils.isEmpty(txtStockBarang.getText().toString().trim()) && !TextUtils.isEmpty(txtHargaBeliBarang.getText().toString().trim()) && !TextUtils.isEmpty(txtHargaJualBarang.getText().toString().trim())){
+            selectedBarang.setNamaBarang(txtNamaBarang.getText().toString().trim());
+            selectedBarang.setStock(Integer.valueOf(txtStockBarang.getText().toString().trim()));
+            selectedBarang.setHargaJual(Integer.valueOf(txtHargaJualBarang.getText().toString().trim()));
+            selectedBarang.setHargaBeli(Integer.valueOf(txtHargaBeliBarang.getText().toString().trim()));
+            database.child("Barang").child(selectedBarang.getIdBarang()).setValue(selectedBarang).addOnSuccessListener(getActivity(), new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    txtNamaBarang.setText("");
+                    txtStockBarang.setText("");
+                    txtHargaBeliBarang.setText("");
+                    txtHargaJualBarang.setText("");
+                    updateData = true;
+                    Toast.makeText(getActivity(), "Data Barang berhasil diubah!", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    @OnClick(R.id.btnDelete)
+    public void btnDeleteBarang(){
+        if(selectedBarang!=null){
+            database.child("Barang").child(selectedBarang.getIdBarang()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    txtNamaBarang.setText("");
+                    txtStockBarang.setText("");
+                    txtHargaBeliBarang.setText("");
+                    txtHargaJualBarang.setText("");
+                    deleteData = true;
+                    Toast.makeText(getActivity(), "Data Barang berhasil didelete!", Toast.LENGTH_SHORT).show();
                 }
             });
         }
