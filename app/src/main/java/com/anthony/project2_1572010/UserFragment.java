@@ -143,7 +143,7 @@ public class UserFragment extends Fragment {
             selectedUser.setNoTelpUser(txtNoTelepeon.getText().toString());
             selectedUser.setUsername(txtUsername.getText().toString());
             selectedUser.setPassword(txtPassword.getText().toString());
-            database.child("User").child(selectedUser.getIdUser()).setValue(selectedUser).addOnSuccessListener(getActivity(), new OnSuccessListener<Void>() {
+            database.child("User").child(selectedUser.getKey()).setValue(selectedUser).addOnSuccessListener(getActivity(), new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     txtAlamat.setText("");
@@ -162,7 +162,7 @@ public class UserFragment extends Fragment {
     @OnClick(R.id.btnDelete)
     public void btnDeleteUser(){
         if(selectedUser!=null){
-            database.child("User").child(selectedUser.getIdUser()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            database.child("User").child(selectedUser.getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     txtAlamat.setText("");

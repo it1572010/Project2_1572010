@@ -194,6 +194,7 @@ public class MainActivity extends AppCompatActivity
                     User user = new User(noteDataSnapshot.getValue(User.class));
                     System.out.println(user.toString());
                     users.add(user);
+                    user.setKey(noteDataSnapshot.getKey());
                 }
                 getUserAdapter().setUsers(users);
             }
@@ -217,6 +218,7 @@ public class MainActivity extends AppCompatActivity
                     Barang barang = new Barang(noteDataSnapshot.getValue(Barang.class));
                     System.out.println(barang.toString());
                     barangs.add(barang);
+                    barang.setKey(noteDataSnapshot.getKey());
                 }
                 getBarangAdapter().setBarangs(barangs);
             }

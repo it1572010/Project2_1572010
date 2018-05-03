@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -123,7 +124,7 @@ public class BarangFragment extends Fragment {
             selectedBarang.setStock(Integer.valueOf(txtStockBarang.getText().toString().trim()));
             selectedBarang.setHargaJual(Integer.valueOf(txtHargaJualBarang.getText().toString().trim()));
             selectedBarang.setHargaBeli(Integer.valueOf(txtHargaBeliBarang.getText().toString().trim()));
-            database.child("Barang").child(selectedBarang.getIdBarang()).setValue(selectedBarang).addOnSuccessListener(getActivity(), new OnSuccessListener<Void>() {
+            database.child("Barang").child(selectedBarang.getKey()).setValue(selectedBarang).addOnSuccessListener(getActivity(), new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     txtNamaBarang.setText("");
@@ -131,6 +132,9 @@ public class BarangFragment extends Fragment {
                     txtHargaBeliBarang.setText("");
                     txtHargaJualBarang.setText("");
                     updateData = true;
+                    Log.d("OUTPUT MESSAGE: ", database.child("Barang").child(selectedBarang.getKey()).toString());
+                    System.out.println("hahahhahaha");
+                    System.out.println(database.child("Barang").child(selectedBarang.getKey()));
                     Toast.makeText(getActivity(), "Data Barang berhasil diubah!", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -140,7 +144,7 @@ public class BarangFragment extends Fragment {
     @OnClick(R.id.btnDelete)
     public void btnDeleteBarang(){
         if(selectedBarang!=null){
-            database.child("Barang").child(selectedBarang.getIdBarang()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+            database.child("Barang").child(selectedBarang.getKey()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     txtNamaBarang.setText("");

@@ -12,6 +12,7 @@ public class Barang implements Parcelable {
     private int hargaJual;
     private String idBarang;
     private String namaBarang;
+    private String key;
     private int stock;
 
     public Barang() {
@@ -83,6 +84,14 @@ public class Barang implements Parcelable {
 
     public void setStock(int stock) {
         this.stock = stock;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     @Override

@@ -15,6 +15,7 @@ public class User implements Parcelable {
     private String noTelpUser;
     private String password;
     private String username;
+    private String key;
 
     public User(User user) {
         admin = user.getAdmin();
@@ -47,6 +48,14 @@ public class User implements Parcelable {
             return new User[size];
         }
     };
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
 
     public int getAdmin() {
         return admin;
