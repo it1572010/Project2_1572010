@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -53,13 +54,15 @@ public class UserFragment extends Fragment {
     RadioButton radAdmin;
     @BindView(R.id.radKasir)
     RadioButton radKasir;
+    @BindView(R.id.btnAdd)
+    Button btnAdd;
+    @BindView(R.id.btnUpdate)
+    Button btnUpdate;
+    @BindView(R.id.btnDelete)
+    Button btnDelete;
 
     private DatabaseReference database;
-    boolean addData;
-    boolean updateData;
-    boolean deleteData;
     int id;
-    private MainActivity mainActivity;
     public User selectedUser;
 
     public UserFragment() {
@@ -69,12 +72,11 @@ public class UserFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         database = FirebaseDatabase.getInstance().getReference();
-        addData=false;
-        updateData=false;
-        deleteData=false;
         id=0;
         View view=inflater.inflate(R.layout.fragment_user,container,false);
         ButterKnife.bind(this,view);
+        btnDelete.setEnabled(false);
+        btnUpdate.setEnabled(false);
         return view;
     }
 
@@ -87,8 +89,17 @@ public class UserFragment extends Fragment {
             txtPassword.setText(user.getPassword());
             txtNama.setText(user.getNamaUser());
             txtNoTelepeon.setText(user.getNoTelpUser());
+            if(user.getAdmin()==1){
+                radAdmin.setChecked(true);
+            }
+            else{
+                radKasir.setChecked(true);
+            }
             txtUsername.setText(user.getUsername());
             selectedUser = user;
+            btnAdd.setEnabled(false);
+            btnUpdate.setEnabled(true);
+            btnDelete.setEnabled(true);
         }
     }
 
@@ -96,40 +107,46 @@ public class UserFragment extends Fragment {
     public void btnAddUser(){
         id=0;
         if(!TextUtils.isEmpty(txtNama.getText().toString().trim()) && !TextUtils.isEmpty(txtUsername.getText().toString().trim()) && !TextUtils.isEmpty(txtNoTelepeon.getText().toString().trim()) && !TextUtils.isEmpty(txtPassword.getText().toString().trim()) && !TextUtils.isEmpty(txtAlamat.getText().toString().trim())){
-            database.child("User").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot noteDataSnapshot : dataSnapshot.getChildren()) {
-                        int cekId = Integer.valueOf(noteDataSnapshot.getValue(User.class).getIdUser().substring(2,3));
-                        id = cekId;
+            if(txtPassword.getText().toString().equals(txtRePassword.getText().toString())){
+                database.child("User").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot noteDataSnapshot : dataSnapshot.getChildren()) {
+                            int cekId = Integer.valueOf(noteDataSnapshot.getValue(User.class).getIdUser().substring(2,3));
+                            id = cekId;
+                        }
                     }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        System.out.println(databaseError.getDetails()+" "+databaseError.getMessage());
+                    }
+                });
+                User user = new User();
+                user.setIdUser("00"+String.valueOf((id+1)));
+                user.setAlamatUser(txtAlamat.getText().toString());
+                user.setNamaUser(txtNama.getText().toString());
+                user.setNoTelpUser(txtNoTelepeon.getText().toString());
+                user.setUsername(txtUsername.getText().toString());
+                if(radAdmin.isChecked()){
+                    user.setAdmin(1);
                 }
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    System.out.println(databaseError.getDetails()+" "+databaseError.getMessage());
+                else{
+                    user.setAdmin(0);
                 }
-            });
-            User user = new User();
-            user.setIdUser("00"+String.valueOf((id+1)));
-            user.setAdmin(1);
-            user.setAlamatUser(txtAlamat.getText().toString());
-            user.setNamaUser(txtNama.getText().toString());
-            user.setNoTelpUser(txtNoTelepeon.getText().toString());
-            user.setUsername(txtUsername.getText().toString());
-            user.setPassword(txtPassword.getText().toString());
-            database.child("User").push().setValue(user).addOnSuccessListener(getActivity(), new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    txtAlamat.setText("");
-                    txtNama.setText("");
-                    txtNoTelepeon.setText("");
-                    txtPassword.setText("");
-                    txtRePassword.setText("");
-                    txtUsername.setText("");
-                    addData = true;
-                    Toast.makeText(getActivity(), "Data User berhasil ditambahkan!", Toast.LENGTH_SHORT).show();
-                }
-            });
+                user.setPassword(txtPassword.getText().toString());
+                database.child("User").push().setValue(user).addOnSuccessListener(getActivity(), new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        txtAlamat.setText("");
+                        txtNama.setText("");
+                        txtNoTelepeon.setText("");
+                        txtPassword.setText("");
+                        txtRePassword.setText("");
+                        txtUsername.setText("");
+                        Toast.makeText(getActivity(), "Data User berhasil ditambahkan!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
         }
     }
 
@@ -137,7 +154,11 @@ public class UserFragment extends Fragment {
     public void btnUpdateUser(){
         if(!TextUtils.isEmpty(txtNama.getText().toString().trim()) && !TextUtils.isEmpty(txtUsername.getText().toString().trim()) && !TextUtils.isEmpty(txtNoTelepeon.getText().toString().trim()) && !TextUtils.isEmpty(txtPassword.getText().toString().trim()) && !TextUtils.isEmpty(txtAlamat.getText().toString().trim())){
             selectedUser.setIdUser("00"+String.valueOf((id+1)));
-            selectedUser.setAdmin(1);
+            if (radAdmin.isChecked()){
+                selectedUser.setAdmin(1);
+            }else{
+                selectedUser.setAdmin(0);
+            }
             selectedUser.setAlamatUser(txtAlamat.getText().toString());
             selectedUser.setNamaUser(txtNama.getText().toString());
             selectedUser.setNoTelpUser(txtNoTelepeon.getText().toString());
@@ -152,7 +173,6 @@ public class UserFragment extends Fragment {
                     txtPassword.setText("");
                     txtRePassword.setText("");
                     txtUsername.setText("");
-                    updateData = true;
                     Toast.makeText(getActivity(), "Data User berhasil diubah!", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -171,7 +191,6 @@ public class UserFragment extends Fragment {
                     txtPassword.setText("");
                     txtRePassword.setText("");
                     txtUsername.setText("");
-                    deleteData = true;
                     Toast.makeText(getActivity(), "Data User berhasil didelete!", Toast.LENGTH_SHORT).show();
                 }
             });

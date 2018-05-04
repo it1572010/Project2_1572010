@@ -13,6 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.anthony.project2_1572010.adapter.UserAdapter;
+import com.anthony.project2_1572010.entity.User;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,6 +30,9 @@ import butterknife.ButterKnife;
  */
 
 public class UserListFragment extends Fragment {
+    private DatabaseReference userRef;
+    private ArrayList<User> users;
+
     private UserAdapter userAdapter;
     @BindView(R.id.rvListUser)
     RecyclerView recyclerUsers;
@@ -38,6 +49,7 @@ public class UserListFragment extends Fragment {
         recyclerUsers.addItemDecoration(did);
         recyclerUsers.setLayoutManager(linearLayoutManager);
         recyclerUsers.setAdapter(getUserAdapter());
+        populateUserData();
         return rootView;
     }
 
@@ -46,5 +58,30 @@ public class UserListFragment extends Fragment {
             userAdapter = new UserAdapter();
         }
         return userAdapter;
+    }
+
+    public void populateUserData() {
+        users = new ArrayList<>();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        userRef = database.getReference();
+        userRef.child("User").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                users.clear();
+                for (DataSnapshot noteDataSnapshot : dataSnapshot.getChildren()) {
+                    User user = new User(noteDataSnapshot.getValue(User.class));
+                    System.out.println(user.toString());
+                    users.add(user);
+                    user.setKey(noteDataSnapshot.getKey());
+                }
+                getUserAdapter().setUsers(users);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println(databaseError.getDetails() + " " + databaseError.getMessage());
+            }
+        });
+        getUserAdapter().setUsers(users);
     }
 }

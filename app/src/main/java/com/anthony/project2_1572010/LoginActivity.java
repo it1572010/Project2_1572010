@@ -29,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private DatabaseReference userRf;
     private ArrayList<User> users;
+    boolean berhasilLogin = false;
 
     public ArrayList<User> getUsers() {
         if (users == null) {
@@ -56,9 +57,17 @@ public class LoginActivity extends AppCompatActivity {
                     for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                         if(dataSnapshot1.getValue(User.class).getUsername().equals(txtUsername.getText().toString().trim()) && dataSnapshot1.getValue(User.class).getPassword().equals(txtPassword.getText().toString().trim())) {
                             Intent intent=new Intent(LoginActivity.this,MainActivity.class);
+                            intent.putExtra("userRole",dataSnapshot1.getValue(User.class).getAdmin());
                             LoginActivity.this.finish();
                             LoginActivity.this.startActivity(intent);
+                            berhasilLogin=true;
                         }
+                    }
+                    if(berhasilLogin==true){
+                        Toast.makeText(LoginActivity.this,"Login Succes",Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        Toast.makeText(LoginActivity.this,"Login Failed",Toast.LENGTH_SHORT).show();
                     }
                 }
 

@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -42,13 +43,15 @@ public class BarangFragment extends Fragment {
     EditText txtHargaBeliBarang;
     @BindView(R.id.txtHargaJualBarang)
     EditText txtHargaJualBarang;
+    @BindView(R.id.btnAdd)
+    Button btnAdd;
+    @BindView(R.id.btnUpdate)
+    Button btnUpdate;
+    @BindView(R.id.btnDelete)
+    Button btnDelete;
 
     private DatabaseReference database;
-    boolean addData;
-    boolean updateData;
-    boolean deleteData;
     int id;
-    private MainActivity mainActivity;
     public Barang selectedBarang;
 
     public BarangFragment() {
@@ -58,11 +61,10 @@ public class BarangFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         database = FirebaseDatabase.getInstance().getReference();
-        addData = false;
-        updateData = false;
-        deleteData = false;
         View view = inflater.inflate(R.layout.fragment_barang,container,false);
         ButterKnife.bind(this,view);
+        btnDelete.setEnabled(false);
+        btnUpdate.setEnabled(false);
         return view;
 
     }
@@ -77,6 +79,9 @@ public class BarangFragment extends Fragment {
             txtHargaJualBarang.setText(String.valueOf(barang.getHargaJual()));
             txtHargaBeliBarang.setText(String.valueOf(barang.getHargaBeli()));
             selectedBarang=barang;
+            btnAdd.setEnabled(false);
+            btnUpdate.setEnabled(true);
+            btnDelete.setEnabled(true);
         }
     }
 
@@ -110,7 +115,6 @@ public class BarangFragment extends Fragment {
                     txtStockBarang.setText("");
                     txtHargaBeliBarang.setText("");
                     txtHargaJualBarang.setText("");
-                    addData = true;
                     Toast.makeText(getActivity(), "Data Barang berhasil ditambahkan!", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -131,7 +135,6 @@ public class BarangFragment extends Fragment {
                     txtStockBarang.setText("");
                     txtHargaBeliBarang.setText("");
                     txtHargaJualBarang.setText("");
-                    updateData = true;
                     Log.d("OUTPUT MESSAGE: ", database.child("Barang").child(selectedBarang.getKey()).toString());
                     System.out.println("hahahhahaha");
                     System.out.println(database.child("Barang").child(selectedBarang.getKey()));
@@ -151,7 +154,6 @@ public class BarangFragment extends Fragment {
                     txtStockBarang.setText("");
                     txtHargaBeliBarang.setText("");
                     txtHargaJualBarang.setText("");
-                    deleteData = true;
                     Toast.makeText(getActivity(), "Data Barang berhasil didelete!", Toast.LENGTH_SHORT).show();
                 }
             });

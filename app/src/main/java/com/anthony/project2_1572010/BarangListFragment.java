@@ -13,6 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.anthony.project2_1572010.adapter.BarangAdapter;
+import com.anthony.project2_1572010.entity.Barang;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -21,6 +29,10 @@ import butterknife.ButterKnife;
  * @author Anthony (1572010)
  */
 public class BarangListFragment extends Fragment {
+
+    private DatabaseReference userRef;
+    private ArrayList<Barang> barangs;
+
     private BarangAdapter barangAdapter;
     @BindView(R.id.rvListBarang)
     RecyclerView recyclerBarangs;
@@ -36,6 +48,7 @@ public class BarangListFragment extends Fragment {
         recyclerBarangs.addItemDecoration(did);
         recyclerBarangs.setLayoutManager(linearLayoutManager);
         recyclerBarangs.setAdapter(getBarangAdapter());
+        populateBarangData();
         return rootView;
     }
 
@@ -44,5 +57,30 @@ public class BarangListFragment extends Fragment {
             barangAdapter = new BarangAdapter();
         }
         return barangAdapter;
+    }
+
+    public void populateBarangData() {
+        barangs=new ArrayList<>();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        userRef = database.getReference();
+        userRef.child("Barang").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                barangs.clear();
+                for (DataSnapshot noteDataSnapshot : dataSnapshot.getChildren()) {
+                    Barang barang = new Barang(noteDataSnapshot.getValue(Barang.class));
+                    System.out.println(barang.toString());
+                    barangs.add(barang);
+                    barang.setKey(noteDataSnapshot.getKey());
+                }
+                getBarangAdapter().setBarangs(barangs);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println(databaseError.getDetails() + " " + databaseError.getMessage());
+            }
+        });
+        getBarangAdapter().setBarangs(barangs);
     }
 }

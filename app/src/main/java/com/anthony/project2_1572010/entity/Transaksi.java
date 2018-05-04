@@ -8,6 +8,7 @@ public class Transaksi implements Parcelable{
     private String idTransaksi;
     private int nominalTransaksi;
     private String tanggalTransaksi;
+    private String key;
 
     public Transaksi() {
     }

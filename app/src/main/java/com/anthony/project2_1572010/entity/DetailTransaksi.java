@@ -8,6 +8,7 @@ import java.util.List;
 public class DetailTransaksi implements Parcelable {
     private List<Barang> barang;
     private Transaksi transaksi;
+    private String key;
 
     public DetailTransaksi() {
     }

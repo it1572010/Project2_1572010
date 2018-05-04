@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.anthony.project2_1572010.adapter.BarangAdapter;
 import com.anthony.project2_1572010.adapter.UserAdapter;
@@ -35,13 +36,11 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, UserAdapter.UserDataListener,
         BarangAdapter.BarangDataListener {
 
-    private DatabaseReference userRef;
-    private ArrayList<User> users;
-    private ArrayList<Barang> barangs;
     private UserAdapter userAdapter;
     private UserListFragment userListFragment;
     private BarangAdapter barangAdapter;
     private BarangListFragment barangListFragment;
+    int userRole;
 
     @BindView(R.id.rvListUser)
     RecyclerView recyclerUsers;
@@ -67,8 +66,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        users = new ArrayList<>();
-        barangs = new ArrayList<>();
+        Intent intent = getIntent();
+        userRole = intent.getIntExtra("userRole", 0);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -93,9 +92,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        populateUserData();
-        populateBarangData();
     }
 
     @Override
@@ -140,27 +136,39 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_kasir) {
-
-        } else if (id == R.id.nav_laporan) {
-
-        } else if (id == R.id.nav_user) {
-            UserFragment userFragment = new UserFragment();
-            FragmentTransaction userTransaction = getSupportFragmentManager().beginTransaction();
-            userTransaction.replace(R.id.frameKiri, userFragment);
-            userTransaction.commit();
-            FragmentTransaction userListTransaction = getSupportFragmentManager().beginTransaction();
-            userListTransaction.replace(R.id.frameKanan, getUserListFragment());
-            userListTransaction.commit();
-            populateUserData();
-        } else if (id == R.id.nav_barang) {
-            BarangFragment barangFragment = new BarangFragment();
-            FragmentTransaction barangTransaction = getSupportFragmentManager().beginTransaction();
-            barangTransaction.replace(R.id.frameKiri, barangFragment);
-            barangTransaction.commit();
+            KasirFragment kasirFragment = new KasirFragment();
+            FragmentTransaction kasirTransaction = getSupportFragmentManager().beginTransaction();
+            kasirTransaction.replace(R.id.frameKiri,kasirFragment);
+            kasirTransaction.commit();
             FragmentTransaction barangLisTransaction = getSupportFragmentManager().beginTransaction();
             barangLisTransaction.replace(R.id.frameKanan, getBarangListFragment());
             barangLisTransaction.commit();
-            populateBarangData();
+        } else if (id == R.id.nav_laporan) {
+
+        } else if (id == R.id.nav_user) {
+            if (userRole == 1) {
+                UserFragment userFragment = new UserFragment();
+                FragmentTransaction userTransaction = getSupportFragmentManager().beginTransaction();
+                userTransaction.replace(R.id.frameKiri, userFragment);
+                userTransaction.commit();
+                FragmentTransaction userListTransaction = getSupportFragmentManager().beginTransaction();
+                userListTransaction.replace(R.id.frameKanan, getUserListFragment());
+                userListTransaction.commit();
+            } else {
+                Toast.makeText(this, "not allowed", Toast.LENGTH_SHORT).show();
+            }
+        } else if (id == R.id.nav_barang) {
+            if (userRole == 1) {
+                BarangFragment barangFragment = new BarangFragment();
+                FragmentTransaction barangTransaction = getSupportFragmentManager().beginTransaction();
+                barangTransaction.replace(R.id.frameKiri, barangFragment);
+                barangTransaction.commit();
+                FragmentTransaction barangLisTransaction = getSupportFragmentManager().beginTransaction();
+                barangLisTransaction.replace(R.id.frameKanan, getBarangListFragment());
+                barangLisTransaction.commit();
+            } else {
+                Toast.makeText(this, "not allowed", Toast.LENGTH_SHORT).show();
+            }
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -183,53 +191,6 @@ public class MainActivity extends AppCompatActivity
         return barangAdapter;
     }
 
-    public void populateUserData() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        userRef = database.getReference();
-        userRef.child("User").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                users.clear();
-                for (DataSnapshot noteDataSnapshot : dataSnapshot.getChildren()) {
-                    User user = new User(noteDataSnapshot.getValue(User.class));
-                    System.out.println(user.toString());
-                    users.add(user);
-                    user.setKey(noteDataSnapshot.getKey());
-                }
-                getUserAdapter().setUsers(users);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println(databaseError.getDetails() + " " + databaseError.getMessage());
-            }
-        });
-        getUserListFragment().getUserAdapter().setUsers(users);
-    }
-
-    public void populateBarangData() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        userRef = database.getReference();
-        userRef.child("Barang").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                barangs.clear();
-                for (DataSnapshot noteDataSnapshot : dataSnapshot.getChildren()) {
-                    Barang barang = new Barang(noteDataSnapshot.getValue(Barang.class));
-                    System.out.println(barang.toString());
-                    barangs.add(barang);
-                    barang.setKey(noteDataSnapshot.getKey());
-                }
-                getBarangAdapter().setBarangs(barangs);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println(databaseError.getDetails() + " " + databaseError.getMessage());
-            }
-        });
-        getBarangListFragment().getBarangAdapter().setBarangs(barangs);
-    }
 
     @Override
     public void onBarangClicked(Barang barang) {
